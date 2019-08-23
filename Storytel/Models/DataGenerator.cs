@@ -28,7 +28,8 @@ namespace Storytel.Models
                         Family = "",
                         UserName = "admin",
                         Password = "Aa@123456",
-                        Email = "admin@storytel.com"
+                        Email = "admin@storytel.com",
+                        IsAdmin =true
                     },
                     new User
                     {
