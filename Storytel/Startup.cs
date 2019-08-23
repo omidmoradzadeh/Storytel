@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Storytel.Models;
 using Storytel.Repository;
 using Storytel.Repository.Interface;
 
@@ -20,6 +22,7 @@ namespace Storytel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<StorytelContext>(options => options.UseInMemoryDatabase(databaseName: "Storytel"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             
