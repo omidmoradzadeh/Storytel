@@ -23,7 +23,6 @@ namespace Storytel.Models
                 context.Users.AddRange(
                     new User
                     {
-                        Id = 1,
                         Name = "Admin",
                         Family = "",
                         UserName = "admin",
@@ -33,7 +32,6 @@ namespace Storytel.Models
                     },
                     new User
                     {
-                        Id = 2,
                         Name = "Omid",
                         Family = "Moradzadeh",
                         UserName = "omidm",

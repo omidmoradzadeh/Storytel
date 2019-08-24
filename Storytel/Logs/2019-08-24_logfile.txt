@@ -1,0 +1,7 @@
+2019-08-24 13:19:14.5313 INFO Getting items
+2019-08-24 17:35:55.2064 ERROR User with id: 3, hasn't been found in db.
+2019-08-24 17:36:37.9919 ERROR User with id: 3, hasn't been found in db.
+2019-08-24 18:21:05.9745 ERROR Something went wrong inside Createuser action: One or more errors occurred. (An item with the same key has already been added. Key: 1)
+2019-08-24 18:21:13.4728 ERROR Something went wrong inside Createuser action: One or more errors occurred. (An item with the same key has already been added. Key: 2)
+2019-08-24 18:22:40.3997 ERROR Something went wrong inside Createuser action: One or more errors occurred. (An item with the same key has already been added. Key: 1)
+2019-08-24 18:24:40.0018 ERROR Something went wrong inside Createuser action: One or more errors occurred. (An item with the same key has already been added. Key: 2)

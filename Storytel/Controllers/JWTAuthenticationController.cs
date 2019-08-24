@@ -4,12 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Storytel.Models;
 using Storytel.Models.VM;
 using Storytel.Repository.Interface;
+using Storytel.Security;
 
 namespace Storytel.Controllers
 {
@@ -19,11 +21,13 @@ namespace Storytel.Controllers
     {
         private IConfiguration _config;
         private IRepositoryWrapper _repoWrapper;
+        private Token token;
 
         public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper)
         {
             _config = config;
             _repoWrapper = repoWrapper;
+            token = new Token(config, repoWrapper);
         }
 
         [HttpPost]
@@ -32,11 +36,11 @@ namespace Storytel.Controllers
             try
             {
                 IActionResult response = Unauthorized();
-                var user = AuthenticateUser(login);
+                var user = token.AuthenticateUser(login);
 
                 if (user != null)
                 {
-                    var tokenString = GenerateJSONWebToken(user);
+                    var tokenString = token.GenerateJSONWebToken(user);
                     response = Ok(new { token = tokenString });
                 }
                 else
@@ -48,43 +52,6 @@ namespace Storytel.Controllers
             catch
             {
                 return StatusCode(500, "Internal server error");
-            }
-        }
-
-        private string GenerateJSONWebToken(User userInfo)
-        {
-            try
-            {
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                var claims = new List<Claim>();
-                claims.Add(new Claim("user", userInfo.UserName));
-
-                var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-                  _config["Jwt:Issuer"],
-                  claims,
-                  expires: DateTime.Now.AddMinutes(120),
-                  signingCredentials: credentials);
-
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        private User AuthenticateUser(LoginVM login)
-        {
-            try
-            {
-                User userData = null;
-                userData = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower() == login.UserName.ToLower()).FirstOrDefault();
-                return userData;
-            }
-            catch
-            {
-                throw;
             }
         }
     }

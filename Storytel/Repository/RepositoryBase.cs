@@ -4,6 +4,7 @@ using Storytel.Repository.Interface;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Storytel.Repository
 {
@@ -16,6 +17,7 @@ namespace Storytel.Repository
             Context = repositoryContext;
         }
 
+        
         public IQueryable<T> FindAll()
         {
             return Context.Set<T>().AsNoTracking();
@@ -24,6 +26,11 @@ namespace Storytel.Repository
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
             return Context.Set<T>().Where(expression).AsNoTracking();
+        }
+
+        public Task<T> Find(int id)
+        {
+            return Context.Set<T>().FindAsync(id);
         }
 
         public void Create(T entity)
@@ -40,5 +47,11 @@ namespace Storytel.Repository
         {
             Context.Set<T>().Remove(entity);
         }
+
+        public async Task SaveAsync()
+        {
+            await Context.SaveChangesAsync();
+        }
+
     }
 }
