@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,11 +21,12 @@ namespace Storytel.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
+    [EnableCors("CorsPolicy")]
     public class UserController : ControllerBase
     {
-        private IRepositoryWrapper _repoWrapper;
-        private ILoggerManager _logger;
-        private UserClaimsPrincipal _userClaimsPrincipal;
+        private readonly IRepositoryWrapper _repoWrapper;
+        private readonly ILoggerManager _logger;
+        private readonly UserClaimsPrincipal _userClaimsPrincipal;
 
 
         public UserController(IRepositoryWrapper repoWrapper, ILoggerManager logger)
@@ -36,7 +38,7 @@ namespace Storytel.Controllers
 
         [HttpGet]
         [Authorize]
-        [Produces(typeof(UserDTO))]
+        [Produces(typeof(UserDetailVM))]
         public async Task<IActionResult> Get()
         {
             try
@@ -58,7 +60,7 @@ namespace Storytel.Controllers
 
         [Authorize]
         [HttpGet("{id}", Name = "UserById")]
-        [Produces(typeof(UserDTO))]
+        [Produces(typeof(UserDetailVM))]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
 

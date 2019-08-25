@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -32,7 +33,6 @@ namespace Storytel.Models
         [StringLength(200)]
         public string Password { get; set; }
 
-
         public bool IsAdmin { get; set; } = false;
 
         public bool IsActive { get; set; } = true;
@@ -41,5 +41,7 @@ namespace Storytel.Models
 
         [Required]
         public DateTime RegisterDate { get; set; } = DateTime.Now;
+
+        public ICollection<Message> Messages { get; set; }
     }
 }

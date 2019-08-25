@@ -28,5 +28,7 @@ namespace Storytel.Models
         public DateTime EditDate { get; set; }
 
         public DateTime DeleteDate { get; set; }
+
+        public User User { get; set; }
     }
 }

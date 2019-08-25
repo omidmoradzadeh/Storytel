@@ -11,6 +11,7 @@ namespace Storytel.Repository.Interface
         Task<IEnumerable<User>> GetAllUserAsync();
         Task<IEnumerable<UserDetailVM>> GetAllUserWithDetailAsync();
         Task<User> GetUserByIdAsync(int userId);
+        Task<int> GetUserByUserNameAsync(string userName);
         Task<UserDetailVM> GetUserWithDetailByIdAsync(int userId);
         Task CreateUserAsync(User user);
         Task<int> CreateUserAsync(User dbUser, UserAddDTO user);

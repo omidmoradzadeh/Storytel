@@ -18,7 +18,7 @@ namespace Storytel.Repository
         public async Task<IEnumerable<User>> GetAllUserAsync()
         {
             return await FindAll()
-                                .OrderBy(x => x.Id)
+                                .OrderBy(user => user.Id)
                                 .ToListAsync();
         }
 
@@ -26,16 +26,16 @@ namespace Storytel.Repository
         public async Task<IEnumerable<UserDetailVM>> GetAllUserWithDetailAsync()
         {
             return await FindAll()
-                               .Select(x => new UserDetailVM()
+                               .Select(user => new UserDetailVM()
                                {
-                                   Id = x.Id,
-                                   Name = x.Name,
-                                   Family = x.Family,
-                                   Email = x.Email,
-                                   UserName = x.UserName,
-                                   IsAdmin = x.IsAdmin
+                                   Id = user.Id,
+                                   Name = user.Name,
+                                   Family = user.Family,
+                                   Email = user.Email,
+                                   UserName = user.UserName,
+                                   IsAdmin = user.IsAdmin
                                })
-                               .OrderBy(x => x.Id)
+                               .OrderBy(user => user.Id)
                                .ToListAsync();
         }
 
@@ -48,10 +48,19 @@ namespace Storytel.Repository
         }
 
 
+        public async Task<int> GetUserByUserNameAsync(string userName)
+        {
+            return await FindByCondition(user => user.UserName.Equals(userName))
+                .Select(user => user.Id)
+                .SingleAsync();
+        }
+
+
         public async Task<UserDetailVM> GetUserWithDetailByIdAsync(int userId)
         {
-            return await FindByCondition(o => o.Id.Equals(userId))
-                           .Select(x => new UserDetailVM() {
+            return await FindByCondition(user => user.Id.Equals(userId))
+                           .Select(x => new UserDetailVM()
+                           {
                                Id = x.Id,
                                Name = x.Name,
                                Family = x.Family,
@@ -95,7 +104,7 @@ namespace Storytel.Repository
             await SaveAsync();
         }
 
-        
+
     }
 
 

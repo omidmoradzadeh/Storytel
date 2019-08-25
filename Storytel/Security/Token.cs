@@ -9,15 +9,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Storytel.Security
 {
     public class Token
     {
 
-        private IConfiguration _config;
-        private IRepositoryWrapper _repoWrapper;
+        private readonly IConfiguration _config;
+        private readonly IRepositoryWrapper _repoWrapper;
 
         public Token(IConfiguration config, IRepositoryWrapper repoWrapper)
         {
@@ -55,10 +54,10 @@ namespace Storytel.Security
             try
             {
                 User userData = null;
-                userData = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower() == login.UserName.ToLower()).FirstOrDefault();
+                userData = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower() == login.UserName.ToLower()).First();
                 return userData;
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }

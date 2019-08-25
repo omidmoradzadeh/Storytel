@@ -28,7 +28,7 @@ namespace Storytel.Models
                         UserName = "admin",
                         Password = "Aa@123456",
                         Email = "admin@storytel.com",
-                        IsAdmin =true
+                        IsAdmin = true
                     },
                     new User
                     {
@@ -37,6 +37,23 @@ namespace Storytel.Models
                         UserName = "omidm",
                         Password = "Aa@123456",
                         Email = "omidm@storytel.com"
+                    });
+
+                context.Messages.AddRange(
+                    new Message
+                    {
+                        UserId = 1,
+                        Text = "Hi There."
+                    },
+                    new Message
+                    {
+                        UserId = 1,
+                        Text = "How are you?"
+                    },
+                    new Message
+                    {
+                        UserId = 2,
+                        Text = "Hi Admin, Thanks a lot."
                     });
 
                 context.SaveChanges();

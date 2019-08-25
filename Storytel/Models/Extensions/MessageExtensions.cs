@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Storytel.Models.DTO;
+using System;
 
 namespace Storytel.Models.Extensions
 {
     public static class MessageExtensions
     {
-        public static void Map(this Message dbMessage, Message message)
+        public static void MapForEdit(this Message dbMessage, MessageEditDTO message)
         {
-            dbMessage.Id = message.Id;
             dbMessage.Text = message.Text;
-            dbMessage.IsDeleted = message.IsDeleted;
+            dbMessage.EditDate = DateTime.Now;
+        }
+
+        public static Message MapForAdd(this Message dbMessage, MessageAddDTO message , int userId)
+        {
+            dbMessage.Text = message.Text;
+            dbMessage.UserId = userId;
+            return dbMessage;
         }
     }
 }

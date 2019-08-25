@@ -8,7 +8,7 @@ namespace Storytel.Models.DTO
 {
     public class UserEditDTO
     {
-        [Required]
+
         public int Id { get; set; }
 
         [Required]
