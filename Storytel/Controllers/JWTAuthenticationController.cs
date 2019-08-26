@@ -41,7 +41,7 @@ namespace Storytel.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest("user name or password must be enterd.");
+                    return BadRequest("{\"title\":\"User name or password must be enterd.\"}");
                 }
 
                 Crypto crypto = new Crypto(CryptoTypes.encTypeTripleDES);
@@ -55,7 +55,7 @@ namespace Storytel.Controllers
                     response = Ok(new { token = tokenString });
                 }
                 else
-                    return NotFound("User Not Found");
+                    return NotFound("{\"title\":\"User not found\"}");
 
 
                 return response;
