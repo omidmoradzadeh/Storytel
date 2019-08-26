@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Storytel.Models;
 using Storytel.Models.VM;
 using Storytel.Repository.Interface;
 using Storytel.Security;
 using Storytel.Services;
+using static Storytel.Security.CryptoLibrary;
+using static Storytel.Security.CryptoLibrary.Crypto;
 
 namespace Storytel.Controllers
 {
@@ -25,7 +25,7 @@ namespace Storytel.Controllers
         private readonly ILoggerManager _logger;
         private readonly Token _token;
 
-        public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper ,  ILoggerManager logger)
+        public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper, ILoggerManager logger)
         {
             _logger = logger;
             _token = new Token(config, repoWrapper);
@@ -38,6 +38,15 @@ namespace Storytel.Controllers
             try
             {
                 IActionResult response = Unauthorized();
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("user name or password must be enterd.");
+                }
+
+                Crypto crypto = new Crypto(CryptoTypes.encTypeTripleDES);
+                login.Password = crypto.Encrypt(login.Password);
+
                 var user = _token.AuthenticateUser(login);
 
                 if (user != null)
@@ -51,9 +60,9 @@ namespace Storytel.Controllers
 
                 return response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError("Invalid user object sent from client.Exception:" + ex.Message??"");
+                _logger.LogError("Invalid user object sent from client.Exception:" + ex.Message ?? "");
                 return StatusCode(500, "Internal server error");
             }
         }

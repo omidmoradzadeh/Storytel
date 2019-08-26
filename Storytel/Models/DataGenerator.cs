@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Storytel.Security.CryptoLibrary;
+using static Storytel.Security.CryptoLibrary.Crypto;
 
 namespace Storytel.Models
 {
@@ -20,13 +22,15 @@ namespace Storytel.Models
                     return;   // Data was already seeded
                 }
 
+                Crypto crypto = new Crypto(CryptoTypes.encTypeTripleDES);
+
                 context.Users.AddRange(
                     new User
                     {
                         Name = "Admin",
                         Family = "",
                         UserName = "admin",
-                        Password = "Aa@123456",
+                        Password = crypto.Encrypt("Aa@123456"),
                         Email = "admin@storytel.com",
                         IsAdmin = true
                     },
@@ -35,7 +39,7 @@ namespace Storytel.Models
                         Name = "Omid",
                         Family = "Moradzadeh",
                         UserName = "omidm",
-                        Password = "Aa@123456",
+                        Password = crypto.Encrypt("Aa@78945"),
                         Email = "omidm@storytel.com"
                     });
 

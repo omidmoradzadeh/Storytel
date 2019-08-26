@@ -53,11 +53,10 @@ namespace Storytel.Security
         {
             try
             {
-                User userData = null;
-                userData = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower() == login.UserName.ToLower()).First();
-                return userData;
+                var userDataList = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower().Equals(login.UserName.ToLower()) && t.Password.Equals(login.Password)).ToList();
+                return userDataList.Count == 1 ? userDataList[0] : null;
             }
-            catch(Exception ex)
+            catch
             {
                 throw;
             }
