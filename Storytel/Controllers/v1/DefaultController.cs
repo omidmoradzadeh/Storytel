@@ -16,7 +16,11 @@ namespace Storytel.Controllers
         {
             try
             {
-                return Ok("true");
+                List<post> post = new List<post>();
+                post.Add(new Controllers.post() { id = 1 , name ="Omid" });
+                post.Add(new Controllers.post() { id = 2 , name ="ALi" });
+                post.Add(new Controllers.post() { id = 3 , name ="Hasan" });
+                return Ok(post);
 
             }
             catch
@@ -24,5 +28,11 @@ namespace Storytel.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+    }
+
+    class post
+    {
+        public int id { get; set; }
+        public string name { get; set; }
     }
 }

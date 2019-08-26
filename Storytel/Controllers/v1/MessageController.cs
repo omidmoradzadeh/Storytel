@@ -33,8 +33,7 @@ namespace Storytel.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        
+        //[Authorize]
         [Produces(typeof(MessageDetailVM))]
         public async Task<IActionResult> Get()
         {
@@ -42,12 +41,12 @@ namespace Storytel.Controllers
             {
                 int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
                 var messageList = _repoWrapper.Message.GetAllMessageWithDetailAsync(userId);
-                return Ok(messageList.Result);
+                return Ok( new ResponseVM (hasError: false,data: messageList.Result));
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside GetMessages action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
@@ -55,7 +54,7 @@ namespace Storytel.Controllers
         [Authorize]
         [HttpGet("{id}", Name = "MessageById")]
         [Produces(typeof(MessageDetailVM))]
-        
+
         public async Task<IActionResult> Get([FromRoute] int id)
         {
 
@@ -69,39 +68,37 @@ namespace Storytel.Controllers
                 var message = await _repoWrapper.Message.GetMessageWithDetailByIdAsync(id);
                 if (message == null)
                 {
-                    return NotFound("Message Not Found");
+                    return NotFound(new ResponseVM("Message Not Found"));
                 }
                 return Ok(message);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside GetMessageById action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
 
         [Authorize]
         [HttpPost]
-        
+
         public IActionResult Post([FromBody]MessageAddDTO message)
         {
             try
             {
                 if (message == null)
                 {
-                    _logger.LogError("Message object sent from client is null.");
-                    return BadRequest("Message object is null");
+                    return BadRequest(new ResponseVM("Message object is not filled correct"));
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogError("Invalid message object sent from client.");
-                    return BadRequest("Invalid model object");
+                    return BadRequest(new ResponseVM("Invalid model object"));
                 }
                 int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
 
-                int messageId = _repoWrapper.Message.CreateMessageAsync(new Message(), message , userId).Result;
+                int messageId = _repoWrapper.Message.CreateMessageAsync(new Message(), message, userId).Result;
                 _repoWrapper.Save();
 
                 return CreatedAtRoute("MessageById", new { id = messageId }, new { id = messageId });
@@ -109,14 +106,14 @@ namespace Storytel.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside CreateMessage action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
 
         [Authorize]
         [HttpPut("{id}")]
-        
+
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] MessageEditDTO message)
         {
 
@@ -125,26 +122,22 @@ namespace Storytel.Controllers
                 int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
                 if (message == null)
                 {
-                    _logger.LogError("Message object sent from client is null.");
-                    return BadRequest("Message object is null");
+                    return BadRequest(new ResponseVM("Message object is not filled correct"));
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogError("Invalid message object sent from client.");
-                    return BadRequest("Invalid model object");
+                    return BadRequest(new ResponseVM("Invalid message object"));
                 }
 
                 var dbMessage = await _repoWrapper.Message.GetMessageByIdAsync(id);
                 if (dbMessage == null || dbMessage.Id == 0)
                 {
-                    _logger.LogError($"Message with id: {id}, hasn't been found in db.");
-                    return NotFound();
+                    return NotFound(new ResponseVM("User not found."));
                 }
                 else if (userId != dbMessage.UserId)
                 {
-                    _logger.LogError($"This message not belog to you.");
-                    return Unauthorized("This message not belog to you");
+                    return Unauthorized(new ResponseVM("This message not belog to you"));
                 }
 
 
@@ -156,14 +149,14 @@ namespace Storytel.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside UpdateMessage action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
 
         [Authorize]
         [HttpDelete("{id}")]
-        
+
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -172,13 +165,11 @@ namespace Storytel.Controllers
                 var message = await _repoWrapper.Message.GetMessageByIdAsync(id);
                 if (message == null || message.Id == 0)
                 {
-                    _logger.LogError($"Message with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 else if (userId != message.UserId)
                 {
-                    _logger.LogError($"This message not belog to you.");
-                    return Unauthorized("This message not belog to you");
+                    return Unauthorized(new ResponseVM("This message not belog to you"));
                 }
                 await _repoWrapper.Message.DeleteMessageAsync(message);
                 _repoWrapper.Save();
@@ -188,7 +179,7 @@ namespace Storytel.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside DeleteMessage action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 

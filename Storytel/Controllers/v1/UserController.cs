@@ -48,12 +48,12 @@ namespace Storytel.Controllers
                     var userList = _repoWrapper.User.GetAllUserWithDetailAsync();
                     return Ok(userList.Result);
                 }
-                return Unauthorized();
+                return Forbid();
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside GetUser action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
@@ -70,22 +70,22 @@ namespace Storytel.Controllers
                 {
                     if (!ModelState.IsValid)
                     {
-                        return BadRequest(ModelState);
+                        return BadRequest(new ResponseVM("Error in modelState"));
                     }
 
                     var user = await _repoWrapper.User.GetUserWithDetailByIdAsync(id);
                     if (user == null)
                     {
-                        return NotFound("User Not Found");
+                        return NotFound(new ResponseVM("User Not Found"));
                     }
-                    return Ok(user);
+                    return Ok(new ResponseVM(hasError:false, data: user));
                 }
-                return Unauthorized();
+                return Forbid();
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside GetUserByID action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
@@ -100,14 +100,12 @@ namespace Storytel.Controllers
                 {
                     if (user == null)
                     {
-                        _logger.LogError("User object sent from client is null.");
-                        return BadRequest("User object is null");
+                        return BadRequest(new ResponseVM("User object is not filled correct"));
                     }
 
                     if (!ModelState.IsValid)
                     {
-                        _logger.LogError("Invalid user object sent from client.");
-                        return BadRequest("Invalid model object");
+                        return BadRequest(new ResponseVM("Invalid model object"));
                     }
 
                     int userId = _repoWrapper.User.CreateUserAsync(new User(), user).Result;
@@ -115,13 +113,13 @@ namespace Storytel.Controllers
 
                     return CreatedAtRoute("UserById", new { id = userId }, new { id = userId });
                 }
-                return Unauthorized();
+                return Forbid();
 
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside Createuser action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
@@ -138,21 +136,18 @@ namespace Storytel.Controllers
                 {
                     if (user == null)
                     {
-                        _logger.LogError("User object sent from client is null.");
-                        return BadRequest("User object is null");
+                        return BadRequest(new ResponseVM("User object is not filled correct"));
                     }
 
                     if (!ModelState.IsValid)
                     {
-                        _logger.LogError("Invalid user object sent from client.");
-                        return BadRequest("Invalid model object");
+                        return BadRequest(new ResponseVM("Invalid model object"));
                     }
 
                     var dbUser = await _repoWrapper.User.GetUserByIdAsync(id);
                     if (dbUser == null || dbUser.Id == 0)
                     {
-                        _logger.LogError($"User with id: {id}, hasn't been found in db.");
-                        return NotFound();
+                        return NotFound(new ResponseVM("User not found"));
                     }
 
                     await _repoWrapper.User.UpdateUserAsync(dbUser, user);
@@ -160,12 +155,12 @@ namespace Storytel.Controllers
 
                     return NoContent();
                 }
-                return Unauthorized();
+                return Forbid();
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside UpdateUser action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 
@@ -182,8 +177,7 @@ namespace Storytel.Controllers
                     var user = await _repoWrapper.User.GetUserByIdAsync(id);
                     if (user == null || user.Id == 0)
                     {
-                        _logger.LogError($"User with id: {id}, hasn't been found in db.");
-                        return NotFound();
+                        return NotFound(new ResponseVM("User not found"));
                     }
 
                     await _repoWrapper.User.DeleteUserAsync(user);
@@ -191,12 +185,12 @@ namespace Storytel.Controllers
 
                     return NoContent();
                 }
-                return Unauthorized();
+                return Forbid();
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Something went wrong inside DeleteUser action: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
 

@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,10 @@ using static Storytel.Security.CryptoLibrary.Crypto;
 
 namespace Storytel.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [Produces("application/json")]
+    [Route("api/v1/[controller]")]
     public class JWTAuthenticationController : ControllerBase
     {
         private readonly ILoggerManager _logger;
@@ -33,7 +35,7 @@ namespace Storytel.Controllers
 
         [HttpPost]
         [EnableCors("CorsPolicy")]
-        public IActionResult Post([FromBody]LoginVM login)
+        public async Task<IActionResult> Post([FromBody]LoginVM login)
         {
             try
             {
@@ -41,7 +43,7 @@ namespace Storytel.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest("{\"title\":\"User name or password must be enterd.\"}");
+                    return BadRequest(new ResponseVM("User name or password must be enterd."));
                 }
 
                 Crypto crypto = new Crypto(CryptoTypes.encTypeTripleDES);
@@ -52,10 +54,10 @@ namespace Storytel.Controllers
                 if (user != null)
                 {
                     var tokenString = _token.GenerateJSONWebToken(user);
-                    response = Ok(new { token = tokenString });
+                    response = Ok(new ResponseVM(hasError:false,data: new { token = tokenString }));
                 }
                 else
-                    return NotFound("{\"title\":\"User not found\"}");
+                    return NotFound(new ResponseVM("User not found"));
 
 
                 return response;
@@ -63,7 +65,7 @@ namespace Storytel.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("Invalid user object sent from client.Exception:" + ex.Message ?? "");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new ResponseVM("Internal server error"));
             }
         }
     }

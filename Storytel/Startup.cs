@@ -11,9 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Extensions.Logging;
 using Storytel.Models;
+using Storytel.Options;
 using Storytel.Repository;
 using Storytel.Repository.Interface;
 using Storytel.Services;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
 using System.Text;
@@ -70,7 +72,7 @@ namespace Storytel
             //    options.Filters.Add(new CorsAuthorizationFilterFactory("AllowMyOrigin"));
             //});
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.AddSwaggerGen(x => { x.SwaggerDoc("v1", new Info { Title = "Storytel API", Version = "v1" }); });
             
         }
 
@@ -88,11 +90,20 @@ namespace Storytel
             }
 
 
-           
+            var swaggerOptions = new Options.SwaggerOptions();
+            Configuration.GetSection(nameof(Options.SwaggerOptions)).Bind(swaggerOptions);
+            app.UseSwagger(option => {option.RouteTemplate = swaggerOptions.JsonRoute;});
+            app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UIEndPoint, swaggerOptions.Description); });
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            });
 
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseMvc();
         }
 

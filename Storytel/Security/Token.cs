@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Storytel.Security
 {
@@ -53,8 +54,8 @@ namespace Storytel.Security
         {
             try
             {
-                var userDataList = _repoWrapper.User.FindByCondition(t => t.UserName.ToLower().Equals(login.UserName.ToLower()) && t.Password.Equals(login.Password)).ToList();
-                return userDataList.Count == 1 ? userDataList[0] : null;
+                var userDataList =  _repoWrapper.User.FindByCondition(t => t.UserName.ToLower().Equals(login.UserName.ToLower()) && t.Password.Equals(login.Password)).ToList();
+                return  userDataList.Count == 1 ? userDataList[0] : null;
             }
             catch
             {
