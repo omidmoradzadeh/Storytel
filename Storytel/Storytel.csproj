@@ -6,6 +6,9 @@
 		<AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
 		<UserSecretsId>9d4f2c7b-0c96-44e8-b656-d30e31a46da8</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<StartupObject>Storytel.Program</StartupObject>
+		<ApplicationIcon />
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
 	<ItemGroup>

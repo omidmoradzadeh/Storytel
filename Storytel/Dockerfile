@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
 WORKDIR /src
-COPY ["Storytel/Storytel.csproj", "Storytel/"]
+COPY ["Storytel.csproj", "Storytel/"]
 RUN dotnet restore "Storytel/Storytel.csproj"
 COPY . .
-WORKDIR "/src/Storytel"
+WORKDIR "/src"
 RUN dotnet build "Storytel.csproj" -c Release -o /app
 
 FROM build AS publish
