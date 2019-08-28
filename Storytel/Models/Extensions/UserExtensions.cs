@@ -16,7 +16,6 @@ namespace Storytel.Models.Extensions
             dbUser.Email = user.Email;
             dbUser.Password = user.Password;
             dbUser.IsActive = user.IsActive;
-            dbUser.IsDeleted = user.IsDeleted;
         }
 
         public static User MapForAdd(this User dbUser, UserAddDTO user)

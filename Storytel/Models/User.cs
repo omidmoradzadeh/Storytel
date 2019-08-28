@@ -37,8 +37,6 @@ namespace Storytel.Models
 
         public bool IsActive { get; set; } = true;
 
-        public bool IsDeleted { get; set; } = false;
-
         [Required]
         public DateTime RegisterDate { get; set; } = DateTime.Now;
 

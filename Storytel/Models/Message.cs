@@ -20,14 +20,10 @@ namespace Storytel.Models
         [StringLength(200)]
         public string Text { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
-
         [Required]
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
         public DateTime EditDate { get; set; }
-
-        public DateTime DeleteDate { get; set; }
 
         public User User { get; set; }
     }

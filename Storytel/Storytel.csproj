@@ -12,6 +12,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\ExtendedModels\**" />
+	  <Content Remove="Models\ExtendedModels\**" />
+	  <EmbeddedResource Remove="Models\ExtendedModels\**" />
+	  <None Remove="Models\ExtendedModels\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
@@ -23,7 +30,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Logs\" />
-	  <Folder Include="Models\ExtendedModels\" />
 	</ItemGroup>
 
 </Project>
