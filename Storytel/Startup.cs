@@ -103,6 +103,11 @@ namespace Storytel
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseHttpsRedirection();
+
+            DefaultFilesOptions filesOptions = new DefaultFilesOptions();
+            filesOptions.DefaultFileNames.Clear();
+            filesOptions.DefaultFileNames.Add("index.html");
+            app.UseDefaultFiles(filesOptions);
             app.UseStaticFiles();
             app.UseMvc();
         }
