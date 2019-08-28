@@ -95,20 +95,20 @@ namespace Storytel
             app.UseSwagger(option => {option.RouteTemplate = swaggerOptions.JsonRoute;});
             app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UIEndPoint, swaggerOptions.Description); });
 
+            DefaultFilesOptions filesOptions = new DefaultFilesOptions();
+            filesOptions.DefaultFileNames.Clear();
+            filesOptions.DefaultFileNames.Add("index.html");
+            app.UseDefaultFiles(filesOptions);
+            app.UseStaticFiles();
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            app.UseAuthentication();
             app.UseHttpsRedirection();
-
-            DefaultFilesOptions filesOptions = new DefaultFilesOptions();
-            filesOptions.DefaultFileNames.Clear();
-            filesOptions.DefaultFileNames.Add("index.html");
-            app.UseDefaultFiles(filesOptions);
-            app.UseStaticFiles();
             app.UseMvc();
         }
 
