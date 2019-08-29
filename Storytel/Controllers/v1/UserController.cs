@@ -39,7 +39,7 @@ namespace Storytel.Controllers
         [HttpGet]
         [Authorize]
         [Produces(typeof(UserDetailVM))]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
             try
             {
