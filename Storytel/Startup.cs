@@ -14,6 +14,7 @@ using Storytel.Models;
 using Storytel.Options;
 using Storytel.Repository;
 using Storytel.Repository.Interface;
+using Storytel.Security;
 using Storytel.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
@@ -37,7 +38,7 @@ namespace Storytel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-      
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
               .AddJwtBearer(options =>
               {
@@ -65,6 +66,7 @@ namespace Storytel
 
             services.AddDbContext<StorytelContext>(options => options.UseInMemoryDatabase(databaseName: "Storytel"));
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddScoped<IUserClaimsPrincipal, UserClaimsPrincipal>();
             services.AddSingleton<ILoggerManager, LoggerManager>();
 
             //services.Configure<MvcOptions>(options =>
@@ -73,7 +75,7 @@ namespace Storytel
             //});
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerGen(x => { x.SwaggerDoc("v1", new Info { Title = "Storytel API", Version = "v1" }); });
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,7 +94,7 @@ namespace Storytel
 
             var swaggerOptions = new Options.SwaggerOptions();
             Configuration.GetSection(nameof(Options.SwaggerOptions)).Bind(swaggerOptions);
-            app.UseSwagger(option => {option.RouteTemplate = swaggerOptions.JsonRoute;});
+            app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
             app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UIEndPoint, swaggerOptions.Description); });
 
             DefaultFilesOptions filesOptions = new DefaultFilesOptions();

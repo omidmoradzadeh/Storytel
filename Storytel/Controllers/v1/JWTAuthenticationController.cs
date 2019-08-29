@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -25,17 +26,19 @@ namespace Storytel.Controllers
     public class JWTAuthenticationController : ControllerBase
     {
         private readonly ILoggerManager _logger;
+        private readonly IConfiguration _config;
         private readonly Token _token;
 
         public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper, ILoggerManager logger)
         {
             _logger = logger;
-            _token = new Token(config, repoWrapper);
+            _config = config;
+            _token = new Token( repoWrapper);
         }
 
         [HttpPost]
         [EnableCors("CorsPolicy")]
-        public async Task<IActionResult> Post([FromBody]LoginVM login)
+        public  IActionResult Post([FromBody][Required]LoginVM login)
         {
             try
             {
@@ -53,8 +56,8 @@ namespace Storytel.Controllers
 
                 if (user != null)
                 {
-                    var tokenString = _token.GenerateJSONWebToken(user);
-                    response = Ok(new ResponseVM(hasError:false,data: new { token = tokenString }));
+                    var tokenString = _token.GenerateJSONWebToken(_config , user);
+                    response = Ok(new ResponseVM(hasError: false, data: new { token = tokenString }));
                 }
                 else
                     return NotFound(new ResponseVM("User not found"));

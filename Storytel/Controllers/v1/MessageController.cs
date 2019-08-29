@@ -35,11 +35,11 @@ namespace Storytel.Controllers
         [HttpGet]
         //[Authorize]
         [Produces(typeof(MessageDetailVM))]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
                 var messageList = _repoWrapper.Message.GetAllMessageWithDetailAsync(userId);
                 return Ok( new ResponseVM (hasError: false,data: messageList.Result));
             }
@@ -96,7 +96,8 @@ namespace Storytel.Controllers
                 {
                     return BadRequest(new ResponseVM("Invalid model object"));
                 }
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
+
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
 
                 int messageId = _repoWrapper.Message.CreateMessageAsync(new Message(), message, userId).Result;
                 _repoWrapper.Save();
@@ -119,7 +120,8 @@ namespace Storytel.Controllers
 
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+
                 if (message == null)
                 {
                     return BadRequest(new ResponseVM("Message object is not filled correct"));
@@ -161,7 +163,8 @@ namespace Storytel.Controllers
         {
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetClaimValue(HttpContext.User, "user")).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+
                 var message = await _repoWrapper.Message.GetMessageByIdAsync(id);
                 if (message == null || message.Id == 0)
                 {

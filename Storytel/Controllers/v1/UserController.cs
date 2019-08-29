@@ -26,14 +26,14 @@ namespace Storytel.Controllers
     {
         private readonly IRepositoryWrapper _repoWrapper;
         private readonly ILoggerManager _logger;
-        private readonly UserClaimsPrincipal _userClaimsPrincipal;
+        private readonly IUserClaimsPrincipal _userClaimsPrincipal;
 
 
-        public UserController(IRepositoryWrapper repoWrapper, ILoggerManager logger)
+        public UserController(IRepositoryWrapper repoWrapper, ILoggerManager logger, IUserClaimsPrincipal userClaimsPrincipal)
         {
             _repoWrapper = repoWrapper;
             _logger = logger;
-            _userClaimsPrincipal = new UserClaimsPrincipal();
+            _userClaimsPrincipal = userClaimsPrincipal;
         }
 
         [HttpGet]
@@ -43,7 +43,7 @@ namespace Storytel.Controllers
         {
             try
             {
-                if (_userClaimsPrincipal.GetClaimValue(HttpContext.User, "is_admin") == "true")
+                if (_userClaimsPrincipal.IsAdmin(HttpContext?.User))
                 {
                     var userList = _repoWrapper.User.GetAllUserWithDetailAsync();
                     return Ok(userList.Result);
@@ -66,7 +66,7 @@ namespace Storytel.Controllers
 
             try
             {
-                if (_userClaimsPrincipal.GetClaimValue(HttpContext.User, "is_admin") == "true")
+                if ( _userClaimsPrincipal.IsAdmin(HttpContext?.User))
                 {
                     if (!ModelState.IsValid)
                     {
@@ -78,7 +78,7 @@ namespace Storytel.Controllers
                     {
                         return NotFound(new ResponseVM("User Not Found"));
                     }
-                    return Ok(new ResponseVM(hasError:false, data: user));
+                    return Ok(new ResponseVM(hasError: false, data: user));
                 }
                 return Forbid();
             }
@@ -96,7 +96,7 @@ namespace Storytel.Controllers
         {
             try
             {
-                if (_userClaimsPrincipal.GetClaimValue(HttpContext.User, "is_admin") == "true")
+                if (_userClaimsPrincipal.IsAdmin(HttpContext?.User))
                 {
                     if (user == null)
                     {
@@ -132,7 +132,7 @@ namespace Storytel.Controllers
 
             try
             {
-                if (_userClaimsPrincipal.GetClaimValue(HttpContext.User, "is_admin") == "true")
+                if (_userClaimsPrincipal.IsAdmin(HttpContext?.User))
                 {
                     if (user == null)
                     {
@@ -171,7 +171,7 @@ namespace Storytel.Controllers
         {
             try
             {
-                if (_userClaimsPrincipal.GetClaimValue(HttpContext.User, "is_admin") == "true")
+                if (_userClaimsPrincipal.IsAdmin(HttpContext?.User))
                 {
 
                     var user = await _repoWrapper.User.GetUserByIdAsync(id);

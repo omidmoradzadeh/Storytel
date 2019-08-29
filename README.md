@@ -7,3 +7,5 @@ Only register users can perform actions. So we have simple autentication for det
 The Api contain 3 controller for intract with clinet:
 1) JWTAuthentication : pass 'UserName' and 'password' for login to the application and in the response generate JWT token for furdure requests. This toke must add in authorization header as Bearer token.
 2) User :
+
+CorsPolicy

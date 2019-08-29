@@ -1,56 +1,178 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Xunit;
 using Storytel.Security;
-using static Storytel.Security.CryptoLibrary.Crypto;
-using static Storytel.Security.CryptoLibrary;
-using Storytel.Models;
 using Storytel.Services;
 using Moq;
 using Storytel.Repository.Interface;
 using Storytel.Controllers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Storytel.Models.VM;
 
 namespace StorytelTest
 {
+
     public class UserTest
     {
+
+
         [Fact]
-        public async System.Threading.Tasks.Task Should_Mock_Function_With_Return_ValueAsync()
+        public void Should_MockUserFunction_Return_SingleUser()
         {
 
             //Arrange
-            Crypto crypto = new Crypto(CryptoTypes.encTypeTripleDES);
-            var user = new User
+            var _mockRepo = new Mock<IRepositoryWrapper>();
+            var _mockPrincipal = new Mock<IUserClaimsPrincipal>();
+            var _mockLogger = new Mock<ILoggerManager>();
+
+            var user = new UserDetailVM()
+            {    
+                Id = 1,
+                Name = "Admin",
+                Family = "",
+                UserName = "admin",
+                Email = "admin@storytel.com",
+                IsAdmin = true,
+            };
+
+            _mockRepo.Setup(x => x.User.GetUserWithDetailByIdAsync(user.Id)).ReturnsAsync(user);
+            _mockPrincipal.Setup(x => x.IsAdmin(It.IsAny<ClaimsPrincipal>())).Returns(true);
+
+            var controller = new UserController(_mockRepo.Object, _mockLogger.Object, _mockPrincipal.Object);
+
+            //Act
+            var actual = controller.Get(user.Id);
+
+            //Assert
+            var actualUser = ((UserDetailVM)((ResponseVM)((OkObjectResult)actual.Result).Value).Data);
+            Assert.Same(user, actualUser);
+            Assert.Equal(user.Id, actualUser.Id);
+            Assert.Equal(user.Name, actualUser.Name);
+            Assert.Equal(user.Family, actualUser.Family);
+            Assert.Equal(user.Email, actualUser.Email);
+            Assert.Equal(user.UserName, actualUser.UserName);
+            Assert.Equal(user.IsAdmin, actualUser.IsAdmin);
+
+        }
+
+
+        [Fact]
+        public void Should_MockUserFunction_Return_Forbiden()
+        {
+
+            //Arrange
+            var _mockRepo = new Mock<IRepositoryWrapper>();
+            var _mockPrincipal = new Mock<IUserClaimsPrincipal>();
+            var _mockLogger = new Mock<ILoggerManager>();
+
+            var user = new UserDetailVM()
             {
                 Id = 1,
                 Name = "Admin",
                 Family = "",
                 UserName = "admin",
-                Password = crypto.Encrypt("Aa@123456"),
                 Email = "admin@storytel.com",
-                IsAdmin = true
+                IsAdmin = true,
             };
 
-            var mockLogger = new Mock<ILoggerManager>();
-            var mock = new Mock<IRepositoryWrapper>();
-            mockLogger.Setup(x => x.LogInfo(""));
-            mock.Setup(x => x.User.Find(user.Id)).ReturnsAsync(user);
+            _mockRepo.Setup(x => x.User.GetUserWithDetailByIdAsync(user.Id)).ReturnsAsync(user);
+            _mockPrincipal.Setup(x => x.IsAdmin(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-            var controller = new UserController(mock.Object, mockLogger.Object);
+            var controller = new UserController(_mockRepo.Object, _mockLogger.Object, _mockPrincipal.Object);
 
             //Act
-            var actual = controller.Get(1);
+            var actual = controller.Get(user.Id).Result;
 
             //Assert
-            Assert.Same(user, actual);
-            Assert.Equal(user.Id, actual.Id);
-            Assert.Equal(user.Name, actual.Name);
-            Assert.Equal(user.Family, actual.Family);
-            Assert.Equal(user.UserName, actual.UserName);
-            Assert.Equal(user.Password, actual.Password);
-            Assert.Equal(user.Email, actual.Email);
-            Assert.Equal(user.IsAdmin, actual.IsAdmin);
+            Assert.Same(actual.GetType(), typeof(ForbidResult));
+        }
+
+        [Fact]
+        public void Should_Mock_Function_With_Return_All_Users()
+        {
+
+            //Arrange
+            List<UserDetailVM> users = new List<UserDetailVM>();
+            users.Add(new UserDetailVM
+            {
+                Id = 1,
+                Name = "Admin",
+                Family = "",
+                UserName = "admin",
+                Email = "admin@storytel.com",
+                IsAdmin = true
+            });
+            users.Add(new UserDetailVM
+            {
+                Id = 2,
+                Name = "Omid",
+                Family = "Moradzadeh",
+                UserName = "omidm",
+                Email = "omidm@storytel.com",
+                IsAdmin = false
+            });
+
+
+            var _mockRepo = new Mock<IRepositoryWrapper>();
+            var _mockPrincipal = new Mock<IUserClaimsPrincipal>();
+            var _mockLogger = new Mock<ILoggerManager>();
+
+            _mockRepo.Setup(x => x.User.GetAllUserWithDetailAsync()).ReturnsAsync(users);
+            _mockPrincipal.Setup(x => x.IsAdmin(It.IsAny<ClaimsPrincipal>())).Returns(true);
+
+            var controller = new UserController(_mockRepo.Object, _mockLogger.Object, _mockPrincipal.Object);
+
+            //Act
+            var actual = controller.Get();
+
+            //Assert
+            var actualUser = ((List<UserDetailVM>)((OkObjectResult)actual).Value);
+            Assert.True(actualUser.Count == 2);
+
+        }
+
+        [Fact]
+        public void Should_Mock_Function_With_Return_All_Users2()
+        {
+
+            //Arrange
+            List<UserDetailVM> users = new List<UserDetailVM>();
+            users.Add(new UserDetailVM
+            {
+                Id = 1,
+                Name = "Admin",
+                Family = "",
+                UserName = "admin",
+                Email = "admin@storytel.com",
+                IsAdmin = true
+            });
+            users.Add(new UserDetailVM
+            {
+                Id = 2,
+                Name = "Omid",
+                Family = "Moradzadeh",
+                UserName = "omidm",
+                Email = "omidm@storytel.com",
+                IsAdmin = false
+            });
+
+
+            var _mockRepo = new Mock<IRepositoryWrapper>();
+            var _mockPrincipal = new Mock<IUserClaimsPrincipal>();
+            var _mockLogger = new Mock<ILoggerManager>();
+
+            _mockRepo.Setup(x => x.User.GetAllUserWithDetailAsync()).ReturnsAsync(users);
+            _mockPrincipal.Setup(x => x.IsAdmin(It.IsAny<ClaimsPrincipal>())).Returns(true);
+
+            var controller = new UserController(_mockRepo.Object, _mockLogger.Object, _mockPrincipal.Object);
+
+            //Act
+            var actual = controller.Get();
+
+            //Assert
+            var actualUser = ((List<UserDetailVM>)((OkObjectResult)actual).Value);
+            Assert.True(actualUser.Count == 2);
+
         }
     }
 }
