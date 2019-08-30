@@ -14,22 +14,23 @@ namespace Storytel.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [Produces("application/json")]
     [EnableCors("CorsPolicy")]
     public class MessageController : ControllerBase
     {
         private readonly IRepositoryWrapper _repoWrapper;
         private readonly ILoggerManager _logger;
-        private readonly UserClaimsPrincipal _userClaimsPrincipal;
+        private readonly IUserClaimsPrincipal _userClaimsPrincipal;
 
 
 
-        public MessageController(IRepositoryWrapper repoWrapper, ILoggerManager logger)
+        public MessageController(IRepositoryWrapper repoWrapper, ILoggerManager logger, IUserClaimsPrincipal userClaimsPrincipal)
         {
+
             _repoWrapper = repoWrapper;
             _logger = logger;
-            _userClaimsPrincipal = new UserClaimsPrincipal();
+            _userClaimsPrincipal = userClaimsPrincipal;
         }
 
         [HttpGet]
@@ -39,7 +40,7 @@ namespace Storytel.Controllers
         {
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext?.User)).Result;
                 var messageList = _repoWrapper.Message.GetAllMessageWithDetailAsync(userId);
                 return Ok( new ResponseVM (hasError: false,data: messageList.Result));
             }
@@ -65,10 +66,17 @@ namespace Storytel.Controllers
                     return BadRequest(ModelState);
                 }
 
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext?.User)).Result;
+
+
                 var message = await _repoWrapper.Message.GetMessageWithDetailByIdAsync(id);
                 if (message == null)
                 {
                     return NotFound(new ResponseVM("Message Not Found"));
+                }
+                if (message.Id != userId)
+                {
+                    return Forbid("This message not belong to you");
                 }
                 return Ok(message);
             }
@@ -87,7 +95,7 @@ namespace Storytel.Controllers
         {
             try
             {
-                if (message == null)
+                if (message == null || message.Text == null || message.Text =="")
                 {
                     return BadRequest(new ResponseVM("Message object is not filled correct"));
                 }
@@ -97,7 +105,7 @@ namespace Storytel.Controllers
                     return BadRequest(new ResponseVM("Invalid model object"));
                 }
 
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext?.User)).Result;
 
                 int messageId = _repoWrapper.Message.CreateMessageAsync(new Message(), message, userId).Result;
                 _repoWrapper.Save();
@@ -120,9 +128,9 @@ namespace Storytel.Controllers
 
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext?.User)).Result;
 
-                if (message == null)
+                if (message == null || message.Text == null || message.Text == "")
                 {
                     return BadRequest(new ResponseVM("Message object is not filled correct"));
                 }
@@ -135,11 +143,11 @@ namespace Storytel.Controllers
                 var dbMessage = await _repoWrapper.Message.GetMessageByIdAsync(id);
                 if (dbMessage == null || dbMessage.Id == 0)
                 {
-                    return NotFound(new ResponseVM("User not found."));
+                    return NotFound(new ResponseVM("Message not found."));
                 }
                 else if (userId != dbMessage.UserId)
                 {
-                    return Unauthorized(new ResponseVM("This message not belog to you"));
+                    return Forbid();
                 }
 
 
@@ -163,16 +171,16 @@ namespace Storytel.Controllers
         {
             try
             {
-                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext.User)).Result;
+                int userId = _repoWrapper.User.GetUserByUserNameAsync(_userClaimsPrincipal.GetUserName(HttpContext?.User)).Result;
 
                 var message = await _repoWrapper.Message.GetMessageByIdAsync(id);
                 if (message == null || message.Id == 0)
                 {
-                    return NotFound();
+                    return NotFound(new ResponseVM("Message not found."));
                 }
                 else if (userId != message.UserId)
                 {
-                    return Unauthorized(new ResponseVM("This message not belog to you"));
+                    return Forbid();
                 }
                 await _repoWrapper.Message.DeleteMessageAsync(message);
                 _repoWrapper.Save();

@@ -12,29 +12,31 @@ using System.Text;
 
 namespace Storytel.Security
 {
-    public class Token
+    public class Token : IToken
     {
 
         private readonly IRepositoryWrapper _repoWrapper;
+        private readonly IConfiguration _config;
 
-        public Token( IRepositoryWrapper repoWrapper)
+        public Token(IConfiguration config ,IRepositoryWrapper repoWrapper)
         {
             _repoWrapper = repoWrapper;
+            _config = config;
         }
 
 
-        public string GenerateJSONWebToken(IConfiguration config , User userInfo)
+        public string GenerateJSONWebToken( User userInfo)
         {
             try
             {
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new List<Claim>();
                 claims.Add(new Claim("user", userInfo.UserName));
                 claims.Add(new Claim("is_admin", userInfo.IsAdmin.ToString()));
 
-                var token = new JwtSecurityToken(config["Jwt:Issuer"],
-                  config["Jwt:Issuer"],
+                var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+                  _config["Jwt:Issuer"],
                   claims,
                   expires: DateTime.Now.AddMinutes(120),
                   signingCredentials: credentials);
@@ -59,5 +61,6 @@ namespace Storytel.Security
                 throw;
             }
         }
+
     }
 }

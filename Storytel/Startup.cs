@@ -67,6 +67,7 @@ namespace Storytel
             services.AddDbContext<StorytelContext>(options => options.UseInMemoryDatabase(databaseName: "Storytel"));
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IUserClaimsPrincipal, UserClaimsPrincipal>();
+            services.AddScoped<IToken, Token>();
             services.AddSingleton<ILoggerManager, LoggerManager>();
 
             //services.Configure<MvcOptions>(options =>

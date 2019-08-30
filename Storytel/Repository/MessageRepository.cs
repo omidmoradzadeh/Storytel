@@ -17,7 +17,7 @@ namespace Storytel.Repository
 
         public async Task<IEnumerable<Message>> GetAllMessageAsync(int userId)
         {
-            return await FindByCondition(user=>user.UserId.Equals(userId))
+            return await FindByCondition(user => user.UserId.Equals(userId))
                                 .OrderBy(x => x.Id)
                                 .ToListAsync();
         }
@@ -31,7 +31,7 @@ namespace Storytel.Repository
                                    Id = x.Id,
                                    Text = x.Text,
                                    UserName = x.User.UserName,
-                                   CreateDate = x.CreateDate
+                                   CreateDate = x.CreateDate.Date
                                })
                                .OrderBy(x => x.Id)
                                .ToListAsync();
@@ -66,9 +66,9 @@ namespace Storytel.Repository
             await SaveAsync();
         }
 
-        public async Task<int> CreateMessageAsync(Message dbMessage, MessageAddDTO message , int userId)
+        public async Task<int> CreateMessageAsync(Message dbMessage, MessageAddDTO message, int userId)
         {
-            Create(dbMessage.MapForAdd(message,userId));
+            Create(dbMessage.MapForAdd(message, userId));
             await SaveAsync();
             return dbMessage.Id;
         }
@@ -92,6 +92,6 @@ namespace Storytel.Repository
             await SaveAsync();
         }
 
-        
+
     }
 }

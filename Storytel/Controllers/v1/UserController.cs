@@ -19,7 +19,7 @@ namespace Storytel.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [Produces("application/json")]
     [EnableCors("CorsPolicy")]
     public class UserController : ControllerBase

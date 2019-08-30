@@ -27,13 +27,13 @@ namespace Storytel.Controllers
     {
         private readonly ILoggerManager _logger;
         private readonly IConfiguration _config;
-        private readonly Token _token;
+        private readonly IToken _token;
 
-        public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper, ILoggerManager logger)
+        public JWTAuthenticationController(IConfiguration config, IRepositoryWrapper repoWrapper, ILoggerManager logger , IToken token)
         {
             _logger = logger;
             _config = config;
-            _token = new Token( repoWrapper);
+            _token = token;
         }
 
         [HttpPost]
@@ -43,7 +43,6 @@ namespace Storytel.Controllers
             try
             {
                 IActionResult response = Unauthorized();
-
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new ResponseVM("User name or password must be enterd."));
@@ -56,7 +55,7 @@ namespace Storytel.Controllers
 
                 if (user != null)
                 {
-                    var tokenString = _token.GenerateJSONWebToken(_config , user);
+                    var tokenString = _token.GenerateJSONWebToken(user);
                     response = Ok(new ResponseVM(hasError: false, data: new { token = tokenString }));
                 }
                 else

@@ -9,6 +9,9 @@
 		<StartupObject>Storytel.Program</StartupObject>
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
+		<Authors>Omid Moradzadeh</Authors>
+		<Product>Storytel Web API</Product>
+		<Description>Web Api for CRUD on Message</Description>
 	</PropertyGroup>
 
 	<ItemGroup>

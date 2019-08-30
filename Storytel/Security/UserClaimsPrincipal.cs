@@ -29,6 +29,6 @@ namespace Storytel.Security
             return GetClaimValue(claims, "is_admin") == "true";
         }
 
-        
+
     }
 }
